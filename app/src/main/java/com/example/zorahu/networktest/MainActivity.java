@@ -4,6 +4,12 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+
+import java.net.InetAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -16,8 +22,25 @@ public class MainActivity extends AppCompatActivity {
 
         mgr = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo info = mgr.getActiveNetworkInfo();
-        if (info.isConnected()){
+        if (info != null && info.isConnected()){
+            try{
+                //Returns all the interfaces on this machine.
+                Enumeration<NetworkInterface> ifs = NetworkInterface.getNetworkInterfaces();
+                while (ifs.hasMoreElements()){
+                    NetworkInterface ip = ifs.nextElement();
+                    Enumeration<InetAddress> ips = ip.getInetAddresses();
+                    while (ips.hasMoreElements()){
+                        InetAddress ia = ips.nextElement();
+                        Log.d("test",ia.getHostAddress());
+                    }
+                }
+            }catch (Exception e){
+                Log.d("test","Oops!");
 
+            }
+
+        }else {
+            Log.d("test","Not connected");
         }
     }
 }
