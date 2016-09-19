@@ -5,10 +5,14 @@ import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
+import java.net.URL;
 import java.util.Enumeration;
 
 public class MainActivity extends AppCompatActivity {
@@ -22,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
         mgr = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         NetworkInfo info = mgr.getActiveNetworkInfo();
+        //Check the Network Connection
         if (info != null && info.isConnected()){
             try{
                 //Returns all the interfaces on this machine.
@@ -42,5 +47,34 @@ public class MainActivity extends AppCompatActivity {
         }else {
             Log.d("test","Not connected");
         }
+    }
+    public void test1(View v){
+        /*
+        連上網路的方法，必須要包在執行緒當中
+        如果沒有會跳出 NetworkOnMainThreadException
+         */
+        new Thread(){
+            @Override
+            public void run(){
+                try{
+                    URL url = new URL("http://www.google.com");
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    conn.connect();
+                    InputStream in = conn.getInputStream();
+                    int c;
+                    StringBuffer sb = new StringBuffer();
+                    while ((c = in.read()) != -1){
+                        sb.append((char)c);
+                    }
+                    in.close();
+                    Log.d("test",sb.toString());
+                }catch (Exception ee){
+                    Log.d("test",ee.toString());
+                }
+
+            }
+        }.start();
+
+
     }
 }
