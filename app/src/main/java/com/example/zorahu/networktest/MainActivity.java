@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
@@ -53,28 +55,44 @@ public class MainActivity extends AppCompatActivity {
         連上網路的方法，必須要包在執行緒當中
         如果沒有會跳出 NetworkOnMainThreadException
          */
-        new Thread(){
-            @Override
-            public void run(){
-                try{
-                    URL url = new URL("http://www.google.com");
-                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                    conn.connect();
-                    InputStream in = conn.getInputStream();
-                    int c;
-                    StringBuffer sb = new StringBuffer();
-                    while ((c = in.read()) != -1){
-                        sb.append((char)c);
-                    }
-                    in.close();
-                    Log.d("test",sb.toString());
-                }catch (Exception ee){
-                    Log.d("test",ee.toString());
-                }
+//        new Thread(){
+//            @Override
+//            public void run(){
+//                try{
+//                    URL url = new URL("http://www.google.com");
+//                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//                    conn.connect();
+//                    InputStream in = conn.getInputStream();
+//                    int c;
+//                    StringBuffer sb = new StringBuffer();
+//                    while ((c = in.read()) != -1){
+//                        sb.append((char)c);
+//                    }
+//                    in.close();
+//                    Log.d("test",sb.toString());
+//                }catch (Exception ee){
+//                    Log.d("test",ee.toString());
+//                }
+//
+//            }
+//        }.start();
+        MyTread mt1 = new MyTread();
+        mt1.start();
+    }
+    private class MyTread extends Thread{
+        @Override
+        public void run(){
+            try {
+                URL url = new URL("http://data.coa.gov.tw/Service/OpenData/EzgoTravelFoodStay.aspx");
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.connect();
+                BufferedReader reader =
+                        new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
+                reader.close();
+            }catch (Exception ee){
+                Log.d("test",ee.toString());
             }
-        }.start();
-
-
+        }
     }
 }
